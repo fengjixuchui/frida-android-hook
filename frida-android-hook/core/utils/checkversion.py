@@ -1,21 +1,22 @@
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from lib.log import *
+from utils.log import *
+from utils.config import *
 
-VERSION = "1.2"
+GLOBLA_CONFIG = config.loadConfig()
 
 def check_version(speak=True):
     """
     check the version number for updates
     """
-    version_url = "https://raw.githubusercontent.com/noobpk/frida-android-hook/master/lib/checkversion.py"
+    version_url = "https://raw.githubusercontent.com/noobpk/frida-android-hook/master/frida-android-hook/core/hook.json"
     try:
         req = requests.get(version_url)
         content = req.text
-        version_identification = content.find("VERSION = ")
-        current_version = content[version_identification:version_identification + 17]
-        current_version = str(current_version.strip().split('"')[1])
-        my_version = VERSION
+        version_identification = content.find('"version": ')
+        current_version = content[version_identification:version_identification + 16]
+        current_version = str(current_version.strip().split('"')[3])
+        my_version = GLOBLA_CONFIG['version']
         if not current_version == my_version:
             if speak:
                 logger.info('[*] New version: {} is available'.format(current_version))
@@ -24,7 +25,7 @@ def check_version(speak=True):
                 return False
         else:
             if speak:
-                logger.info('[*] iOShook already up to date.')
+                logger.info('[*] AndroidHook already up to date.')
                 return True
     except Exception:
         logger.error("[x_x] Error checking version, try again laster.")
